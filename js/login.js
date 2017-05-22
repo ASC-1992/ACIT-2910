@@ -26,7 +26,11 @@ $(document).ready(function(){
            success:function(resp){
                if(resp.status == "success"){
                    console.log("logged in");
-                   location.href = "/profile"
+                   if(resp.type == "customer"){
+                       location.href = "/menu";
+                   } else {
+                       location.href = "/profile";
+                   }
                } else {
                    console.log("cant log in");
                    alert("Sorry, that email/password combination doesn't exist")

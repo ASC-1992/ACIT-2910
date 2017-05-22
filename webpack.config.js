@@ -13,7 +13,8 @@ var config = {
         "kitchen": sF+"/kitchen.js",
         "cart":sF+"/cart.js",
         "faq":sF+"/faq.js",     
-        "admin":sF+"/admin.js"
+        "admin":sF+"/admin.js",
+        "ns":sF+"/nowServing.js"
     },
     output:{
         filename:"[name]bundle.js",

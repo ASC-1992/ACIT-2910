@@ -149,8 +149,20 @@ $(document).ready(function(){
                             success:function(resp){
                                 if(resp.status == "success"){
                                     alert(title + " has been added to your order!")
+                                    $.ajax({
+                                        url:"/menuCount",
+                                        type:"post",
+
+                                        success:function(resp){
+                                            console.log("Menu Count")
+                                            console.log(resp.msg)
+                                        }
+                                    });
                                 } else if(resp.status == "fail"){
                                     alert("Okay alex that didnt work")
+                                } else if(resp.status == "itemLimit"){
+                                    alert("Your cart is maxed, please go to your cart to remove items");
+                                    //location.href = "/cart";
                                 }
                                 
                             }

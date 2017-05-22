@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!-- meta viewport ensures touch screen zoming is compatible -->
+        
+        <title>Your Meal is less than a Minute Away</title>
+        <link rel="stylesheet" type="text/css" href="/css/nowServingStyle.css">
+        <link rel="stylesheet" type="text/css" href="/css/homeStyle.css">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+        
+    </head>
+    <body style='background-color: black'>
+        <div id="homeHeader" class="header parallax__layer parallax__fg">
+            <div id="homeLogo" class="kit"></div>
+            <div id="login" class="kit">LOGIN</div>
+            <div id="logout" class="kit">LOGOUT</div>
+            <div id="profile" class="kit">PROFILE</div>
+            <div id="support" class="kit">SUPPORT</div>
+            <div id="cart" class="kit">CART</div>
+        </div>
+        <div id="YOURORDER"></div>
+        <div class='container'>
+            <div id='nowServing'class='row'>
+                <div id='orderReadyContainer' class='col-md-8'>
+                    Now Serving
+                    <div class='row'>
+                    <div id='order1' class='col-md-4'></div>
+                    <div id='order2' class='col-md-4'></div>
+                    <div id='order3' class='col-md-4'></div>
+                    </div>
+                    
+                </div>
+                <div id='ordersPreparedContainer' class='col-md-4'>Orders Being Prepared</div>
+            </div>
+        </div>
+
+        <script src="/socket.io/socket.io.js"></script>
+        <script src='/builder/nsbundle.js'></script>
+        
+    </body>
+</html>
