@@ -476,7 +476,7 @@ app.post("/checkout", function(req, resp){
             resp.send(obj);
         }
         
-        client.query("INSERT INTO kitchen (itemName, orderid, qty) SELECT itemName, orderid, itemqty FROM items WHERE orderid = $1 RETURNING itemName, qty", [req.session.orderNum], function(err, result){
+        client.query("INSERT INTO kitchen (itemName, orderid, qty, price) SELECT itemName, orderid, itemqty, price FROM items WHERE orderid = $1 RETURNING itemName, qty", [req.session.orderNum], function(err, result){
             done();
             if(err){
                 console.log(err);
@@ -684,27 +684,35 @@ app.post("/removeItems", function(req,resp){
                 msg: "CONNECTION FAIL"
             }
         }
-
-        client.query("DELETE FROM kitchen WHERE orderid = $1", [orderid], function(err, result){
+        ///Using this so it so it inserts into readyOrder table getting rid of the ajax call that is called earlier (is this refactoring it sounds like refactoring), also is going to used by Alex to make a reciept!
+        
+        client.query("INSERT INTO readyorder (orderid, itemname, qty, price) SELECT orderid, itemname, qty, price FROM kitchen WHERE orderid = $1 RETURNING orderid", [orderid], function(err, result){
             done();
-            if(err){
-                    console.log(err);
-                    var obj = {
-                        status:"fail"
+            if(err){console.log(err)}
+            
+            if(result.rows.length > 0){
+                client.query("DELETE FROM kitchen WHERE orderid = $1", [orderid], function(err, result){
+                    done();
+                    if(err){
+                            console.log(err);
+                            var obj = {
+                                status:"fail"
+                            }
                     }
-            }
-            try{
-                if(result.rows.length > 0) {
-                var obj = {
-                    status:"success"
-                    }
+                    try{
+                        if(result.rows.length > 0) {
+                        var obj = {
+                            status:"success"
+                            }
 
-                }
-            } catch (TypeError){
-                console.log("CAUGHT U DUMB ERROR");
-                var obj = {
-                    status:"FAILED"
-                };
+                        }
+                    } catch (TypeError){
+                        console.log("CAUGHT U DUMB ERROR");
+                        var obj = {
+                            status:"FAILED"
+                        };
+                    }
+                });
             }
         });
 
@@ -1109,13 +1117,24 @@ app.post("/checkorder", function(req, resp){
     
     if(order == req.session.orderNum){
         pg.connect(dbURL, function(err, client, done){
-            client.query("DELETE FROM readyOrder WHERE orderid = $1", [req.session.orderNum], function(err, result){
+            client.query("SELECT * FROM readyOrder WHERE orderid = $1", [req.session.orderNum], function(err, result){
                 done();
+                if(result.rows.length > 0){
+                    var obj = {
+                        status:"success",
+                        rows: result.rows
+                    }
+                    resp.send(obj);
+                    client.query("DELETE FROM readyOrder WHERE orderid = $1", [req.session.orderNum], function(err, result){
+                        done();
+                    });
+                    
+                }
             });
+
             client.query("DELETE FROM orders WHERE orderid = $1", [req.session.orderNum], function(err, result){
                 done();
             });
-            resp.send({status:"success"});
         });
     } else {
         resp.send({status:"fail"});
@@ -1123,18 +1142,6 @@ app.post("/checkorder", function(req, resp){
 
 });
 
-app.post("/completeOrder", function(req, resp){
-    pg.connect(dbURL, function(err, client, done){
-        client.query("INSERT INTO readyOrder(orderid) VALUES ($1)", [req.body.orderid], function(err, result){
-            done();
-        });
-        
-        client.query("DELETE FROM kitchen WHERE orderid = ($1)", [req.body.orderid], function(err, result){
-            done();
-        });
-        resp.send({status:"success"});
-    });
-})
 
 app.get("/xiEzMyEY6LAhMzQhYS0=", function(req, resp){
     //This is basically to send information to the profile page, its an encrypted word (probably doesnt need to be just trying to be sneaky)

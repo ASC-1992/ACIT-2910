@@ -86,12 +86,14 @@ function createReadyOrders(obj){
                     order: this.ids
                 },
                 success:function(resp){
-                    if(resp.status == "success"){                        
-                        alert("Enjoy Your Meal!");
-                        location.href = "/";
-                    } else if(resp.status == "fail"){
+                    if(resp.status == "fail"){                        
                         console.log("Order not correct");
                         alert("that order is not yours fella");
+                    } else if(resp.status == "success"){
+                        var receipt = createRecepit(resp.rows);
+                        alert("Enjoy Your Meal! \n\n " + receipt);
+                        
+                        location.href = "/";
                     }
                 }
             });
@@ -108,5 +110,20 @@ function createToBeCooked(obj){
         ndiv.className = "default";
         document.getElementById("ordersPreparedContainer").appendChild(ndiv);
     }
+}
+
+function createRecepit(obj){
+    var complete = "RECEPIT\n ====================\n";
+    var totalPrice = 0;
+    
+    for(var i = 0; i<obj.length; i++){
+        var rowPrice = obj[i].qty * obj[i].price
+        var row = i+1 + ")  " + obj[i].itemname + " x " + obj[i].qty + "......" + rowPrice + "\n";
+        
+        complete += row;
+        totalPrice += rowPrice;
+    };
+    complete += "\n TOTAL PRICE = $" + totalPrice + "\n ====================";
+    return complete;
 }
 
