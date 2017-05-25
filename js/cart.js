@@ -59,6 +59,8 @@ $(document).ready(function(){
         success:function(resp){
             for(var i = 0; i<resp.length; i++){
                 
+                var rowPrice = 0;
+                var rowPrice = resp[i].itemqty * resp[i].price
                 var ndiv = document.createElement("div");
                 ndiv.className = "itemsContainer";
                 var closeBut = document.createElement("button");
@@ -68,7 +70,7 @@ $(document).ready(function(){
                 ndiv.appendChild(closeBut);
                 var infoDiv = document.createElement("div");
                 infoDiv.className = "info";
-                infoDiv.innerHTML = resp[i].itemname + ": Quantity " + resp[i].itemqty + " = $" + resp[i].price;
+                infoDiv.innerHTML = resp[i].itemname + ": Quantity " + resp[i].itemqty + " = $" + rowPrice;
                 ndiv.appendChild(infoDiv);
                 var foodpic = document.createElement("img");
                 foodpic.className = "foodPic";
@@ -76,7 +78,7 @@ $(document).ready(function(){
                 foodpic.src = "/fp/" + string + ".jpg";
                 ndiv.appendChild(foodpic);
                 
-                totalprice += resp[i].price;
+                totalprice += rowPrice;
                 
                 closeBut.titlename = resp[i].itemname;
                 

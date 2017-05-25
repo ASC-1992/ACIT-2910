@@ -141,35 +141,55 @@ $(document).ready(function(){
                     var price = this.price;
                     
                     orderButton.addEventListener("click", function(){
-                        $.ajax({
-                            url:"/ordering",
-                            type:"post",
-                            data:{
-                                itemName: title,
-                                price: price,
-                            },
-                            success:function(resp){
-                                if(resp.status == "success"){
-                                    alert(title + " has been added to your order!")
-                                    $.ajax({
-                                        url:"/menuCount",
-                                        type:"post",
+                        var qty = document.getElementById("quanPicker").value;
+                        if(qty == ""){
+                            alert("Please select a Quantity")
+                        } else {
+                            $.ajax({
+                                url:"/orderingIndividualItem",
+                                type:"post",
+                                data:{
+                                    itemName: title
+                                },
+                                success:function(resp){
+                                    if(resp.status == "fail"){
+                                        alert("You have already added this item to your cart, if you wish to change your Quantity please remove it from your cart and add it again")
+                                    } else if(resp.status == "success"){                                    $.ajax({
+                                            url:"/ordering",
+                                            type:"post",
+                                            data:{
+                                                itemName: title,
+                                                price: price,
+                                                qty: qty
+                                            },
+                                            success:function(resp){
+                                                if(resp.status == "success"){
+                                                    alert(title + " has been added to your order!")
+                                                    $.ajax({
+                                                        url:"/menuCount",
+                                                        type:"post",
 
-                                        success:function(resp){
-                                            console.log("Menu Count")
-                                            console.log(resp.msg)
-                                        }
-                                    });
-                                } else if(resp.status == "fail"){
-                                    alert("Okay alex that didnt work")
-                                } else if(resp.status == "itemLimit"){
-                                    alert("Your cart is maxed, please go to your cart to remove items");
-                                    location.href = "/cart";
+                                                        success:function(resp){
+                                                            console.log("Menu Count")
+                                                            console.log(resp.msg)
+                                                        }
+                                                    });
+                                                } else if(resp.status == "fail"){
+                                                    alert("Okay alex that didnt work")
+                                                } else if(resp.status == "itemLimit"){
+                                                    alert("Your cart is maxed, please go to your cart to remove items");
+                                                    location.href = "/cart";
+                                                }
+
+                                            }
+
+                                        });
+                                        
+                                    }
                                 }
-                                
-                            }
-                            
-                        })
+                            })
+                        }
+
                     });
                 });
         };
