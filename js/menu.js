@@ -154,7 +154,8 @@ $(document).ready(function(){
                                 success:function(resp){
                                     if(resp.status == "fail"){
                                         alert("You have already added this item to your cart, if you wish to change your Quantity please remove it from your cart and add it again")
-                                    } else if(resp.status == "success"){                                    $.ajax({
+                                    } else if(resp.status == "success"){                                    
+                                        $.ajax({
                                             url:"/ordering",
                                             type:"post",
                                             data:{

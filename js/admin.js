@@ -1,5 +1,4 @@
 $(document).ready(function(){
-    daysSales();
     $.ajax({
         url:"/xiEzMyEY6LAhMzQhYS0=",
         success:function(resp){
