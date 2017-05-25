@@ -126,6 +126,7 @@ $(document).ready(function(){
                     var orderButton = document.createElement("div");
                     orderButton.innerHTML = "ORDER NOW";
                     orderButton.id = "descDiv";
+                    var quanChild = document.getElementById("quanPicker");
                     document.getElementById("testInfo").style.opacity = "1";
                     var nnImg = document.createElement("img");
                     nnImg.className = "menuImg";
@@ -133,6 +134,7 @@ $(document).ready(function(){
                     document.getElementById("testInfo").innerHTML = this.title + "<br>$"+this.price+ ",  "+ this.desc;
                     document.getElementById("testInfo").appendChild(nnImg);
                     document.getElementById("testInfo").appendChild(orderButton);
+                    document.getElementById("testInfo").appendChild(quanChild);
                     console.log("working!");
                                         
                     var title = this.title;

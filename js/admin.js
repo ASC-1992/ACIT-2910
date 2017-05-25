@@ -44,36 +44,45 @@ $(document).ready(function(){
         
     // Third level tables
     var tableInfo = document.getElementById("tableInfo");
-    var ordersTable = document.getElementById("ordersTable");
-    var itemsTable = document.getElementById("itemsTable");
+    var reportInfo = document.getElementById("reportInfo");
     
     // Search item in database buttons
     var searchDB = document.getElementById("find");
     var changeDB = document.getElementById("changeDB");
     
+    // Filter report buttons
+    var main = document.getElementById("main");
+    var sides = document.getElementById("sides");
+    var dessert = document.getElementById("dessert");
+    var beverage = document.getElementById("beverage");
+    
     // Total amounts integers
     var dbTotalPrice = 0;
-    var ordersTotalPrice = 0;
-    var itemsTotalPrice = 0;
+    var revenueTotalPrice = 0;
+    
+    var mainPrice = 0;
+    var sidePrice = 0;
+    var dessPrice = 0;
+    var bevPrice = 0;
     
     // Total amounts divs
-    var dbTotal = document.getElementById("dbTotal")
-    var ordersTotal = document.getElementById("ordersTotal")
-    var itemsTotal = document.getElementById("itemsTotal")
+    var dbTotal = document.getElementById("dbTotal");
+    var revenueTotal = document.getElementById("revenueTotal");
+    
+    // used to calculate how much quantity was sold - 100 of each item for now
+    var startQty = 100;
     
     // Store Status
     $(function(){
-        $("#open").click(function() {      
-            theStatus.innerHTML = "Open!";
-            theStatus.style.color = "green";
-            
+        $("#open").click(function() {                  
             $.ajax({
                 url:"/weAreOpen",
                 type:"post", //"post" is behind the scenes (invisible) versus "get" (hijackable)
                 success:function(resp){
                     if(resp.status == "success"){
                         alert("ROLLOUT");
-//                        alert(resp.theStatus);
+                        theStatus.innerHTML = "Open!";
+                        theStatus.style.color = "green";
                     } else {
                         alert("Couldn't reset data");
                     }
@@ -84,16 +93,14 @@ $(document).ready(function(){
     
     $(function(){
         $("#close").click(function() {   
-            theStatus.innerHTML = "Closed!";
-            theStatus.style.color = "red";
-            
             $.ajax({
                 url:"/weAreClosed",
                 type:"post", //"post" is behind the scenes (invisible) versus "get" (hijackable)
                 success:function(resp){
                     if(resp.status == "success"){
                         alert("CLOSED SHOP");
-//                        alert(resp.theStatus);
+                        theStatus.innerHTML = "Closed!";
+                        theStatus.style.color = "red";
                     } else {
                         alert("Couldn't reset data");
                     }
@@ -105,10 +112,10 @@ $(document).ready(function(){
     // First Level Yellow Search Button
     $(function(){
         $("#searchBut").click(function() {
-            result.innerHTML = "";
+            clearScreen();
             dbTotal.innerHTML = "";
             $("#tableInfo td").remove(); 
-            hideReports();
+            
             menuText.innerHTML = "SEARCH MENU";
             viewSearch.style.display = "inline";
             result.appendChild(viewSearch);
@@ -119,9 +126,9 @@ $(document).ready(function(){
     // First Level Green Add Button
     $(function(){
         $("#add").click(function() {
-            result.innerHTML = "";
+            clearScreen();
             tableInfo.style.display = "none";
-            hideReports();
+            
             menuText.innerHTML = "ADD MENU";
             addMenu.style.display = "inline";
             result.appendChild(addMenu);
@@ -131,9 +138,9 @@ $(document).ready(function(){
     // First Level Red Edit Button
     $(function(){
         $("#edit").click(function() {
-            result.innerHTML = "";
+            clearScreen();
             $("#tableInfo td").remove(); 
-            hideReports();
+            
             menuText.innerHTML = "EDIT MENU";
             editSearch.style.display = "inline";
             result.appendChild(editSearch);
@@ -144,14 +151,15 @@ $(document).ready(function(){
     // First Level View Reports Button
     $(function(){
         $("#report").click(function() {
-            result.innerHTML = "";
-            ordersTotal.innerHTML = "";
-            itemsTotal.innerHTML = "";
+            clearScreen();
+            $("#reportInfo td").remove(); 
+            revenueTotalPrice = 0;
             tableInfo.style.display = "none";
-            hideReports();
-            menuText.innerHTML = "VIEW REPORTS";
+            
             viewReport.style.display = "inline";
             result.appendChild(viewReport);
+            soldItems();
+            menuText.innerHTML = "VIEW REPORTS";
         });
     });
     
@@ -226,25 +234,42 @@ $(document).ready(function(){
         });
     });    
     
-    // Second Level View Orders Report button
+    // Second Level Filter Report Buttons
+    $(function() {    
+        $("#main").click(function() {
+            $('#reportInfo tr:contains("main")').show();
+            $('#reportInfo tr:not(:contains("main"))').hide();
+            document.getElementById("head").style.display = "table-row";
+            revenueTotal.innerHTML = "Earned revenue for MAIN: $" + mainPrice;
+        });
+    });
+    
     $(function(){
-        $("#ordersReport").click(function() {
-            itemsTable.style.display = "none";
-            $("#ordersTable td").remove();
-            ordersTotalPrice = 0;
-            ordersDB();
+        $("#sides").click(function() {
+            $('#reportInfo tr:contains("sides")').show();
+            $('#reportInfo tr:not(:contains("sides"))').hide();
+            document.getElementById("head").style.display = "table-row";  
+            revenueTotal.innerHTML = "Earned revenue for SIDES: $" + sidePrice;
         });
     });    
     
-    // Second Level View Items Report button
     $(function(){
-        $("#itemsReport").click(function() {
-            ordersTable.style.display = "none";
-            $("#itemsTable td").remove(); 
-            itemsTotalPrice = 0;
-            itemsDB();
+        $("#dessert").click(function() {
+            $('#reportInfo tr:contains("dessert")').show();
+            $('#reportInfo tr:not(:contains("dessert"))').hide();
+            document.getElementById("head").style.display = "table-row"; 
+            revenueTotal.innerHTML = "Earned revenue for DESSERTS: $" + dessPrice;
         });
-    });  
+    });    
+    
+    $(function(){
+        $("#beverage").click(function() {
+            $('#reportInfo tr:contains("beverage")').show();
+            $('#reportInfo tr:not(:contains("beverage"))').hide();
+            document.getElementById("head").style.display = "table-row";
+            revenueTotal.innerHTML = "Earned revenue for BEVERAGES: $" + bevPrice;
+        });
+    });
     
     // Third Level Edit Change Price Button
     $(function(){
@@ -363,7 +388,7 @@ $(document).ready(function(){
         return email.match(/^(.+)@/)[1];
     };
     
-    // searches the DB and returns items with the inputted name value
+    // searches the inventory table and returns items with the inputted name value
     function displayDB(){
         var searchName = document.getElementById("searchName").value;
         tableInfo.style.display = "block";
@@ -404,84 +429,61 @@ $(document).ready(function(){
                 dbTotal.innerHTML = "Total price of search result: $" + dbTotalPrice;
             }
         });
-    };    
-    
-    // returns the orders table
-    function ordersDB(){
-        ordersTable.style.display = "block";
-
-        $.ajax({
-            url:"/getOrders",
-            type:"post", //"post" is behind the scenes (invisible) versus "get" (hijackable)
-            success:function(resp){
-                //loop through the select
-                for(var i = 0; i<resp.length; i++){
-                    var tr = ordersTable.insertRow();
-                    var orderid = document.createElement("td");
-                    var datetime = document.createElement("td");
-                    var ordernum = document.createElement("td");
-                    var totalprice = document.createElement("td");
-                    var userid = document.createElement("td");
-
-                    orderid.textContent = resp[i].orderid;
-                    datetime.textContent = resp[i].datetime;
-                    ordernum.textContent = resp[i].ordernum;
-                    totalprice.textContent = resp[i].totalprice;
-                    userid.textContent = resp[i].userid;
-
-                    tr.appendChild(orderid);
-                    tr.appendChild(datetime);
-                    tr.appendChild(ordernum);
-                    tr.appendChild(totalprice);
-                    tr.appendChild(userid);
-                    
-                    ordersTotalPrice = ordersTotalPrice + resp[i].totalprice;
-                }
-                ordersTotal.innerHTML = "Total price of all orders: $" + ordersTotalPrice;
-            }
-        });
-    };    
-    
-    // returns the items table
-    function itemsDB(){
-        itemsTable.style.display = "block";
-
-        $.ajax({
-            url:"/getItems",
-            type:"post", //"post" is behind the scenes (invisible) versus "get" (hijackable)
-            success:function(resp){
-                //loop through the select
-                for(var i = 0; i<resp.length; i++){
-                    var tr = itemsTable.insertRow();
-                    var orderid = document.createElement("td");
-                    var itemname = document.createElement("td");
-                    var datetime = document.createElement("td");
-                    var itemqty = document.createElement("td");
-                    var price = document.createElement("td");
-
-                    orderid.textContent = resp[i].orderid;
-                    itemname.textContent = resp[i].itemname;
-                    datetime.textContent = resp[i].datetime;
-                    itemqty.textContent = resp[i].itemqty;
-                    price.textContent = resp[i].price;
-
-                    tr.appendChild(orderid);
-                    tr.appendChild(itemname);
-                    tr.appendChild(datetime);
-                    tr.appendChild(itemqty);
-                    tr.appendChild(price);
-                    
-                    itemsTotalPrice = itemsTotalPrice + resp[i].price;
-                }
-                itemsTotal.innerHTML = "Total price of all items: $" + itemsTotalPrice;
-            }
-        });
     };
     
-    // hides report tables
-    function hideReports(){
-        ordersTable.style.display = "none";
-        itemsTable.style.display = "none";
+    // searches the inventory table and returns items where quantity is less than start
+    function soldItems(){
+        reportInfo.style.display = "block";
+
+        $.ajax({
+            url:"/getSold",
+            type:"post", //"post" is behind the scenes (invisible) versus "get" (hijackable)
+            success:function(resp){
+                //loop through the select
+                for(var i = 0; i<resp.length; i++){
+                    var tr = reportInfo.insertRow();
+                    var name = document.createElement("td");
+                    var price = document.createElement("td");
+                    var qty = document.createElement("td");
+                    var type = document.createElement("td");
+                    var revenue = document.createElement("td");
+                    
+                    var soldQty = startQty - resp[i].qty;
+                    var revenueEarned = soldQty * resp[i].price;
+                    
+                    name.textContent = resp[i].itemname;
+                    price.textContent = resp[i].price;
+                    qty.textContent = soldQty;
+                    type.textContent = resp[i].type;
+                    revenue.textContent = "$" + revenueEarned;
+
+                    tr.appendChild(name);
+                    tr.appendChild(price);
+                    tr.appendChild(qty);
+                    tr.appendChild(type);
+                    tr.appendChild(revenue);
+                    
+                    if(resp[i].type == "main"){
+                        mainPrice += revenueEarned;
+                    } else if(resp[i].type == "sides") {
+                        sidePrice += revenueEarned;
+                    } else if(resp[i].type == "dessert") {
+                        dessPrice += revenueEarned;
+                    } else if(resp[i].type == "beverage") {
+                        bevPrice += revenueEarned;
+                    }
+                    
+                    revenueTotalPrice = revenueTotalPrice + revenueEarned;
+                }
+                revenueTotal.innerHTML = "Total price of earned revenue: $" + revenueTotalPrice;
+            }
+        });
+    }; 
+    
+    // clears the divs to display the correct information
+    function clearScreen() {
+        result.innerHTML = "";
+        reportInfo.style.display = "none";
     }
     
     function PreviousDaysSales(){

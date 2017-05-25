@@ -325,18 +325,7 @@ function initSockets(){
                            console.log(resp.status);
                        }
                    });
-                    //ALEX'S CODE TO GET EVERYTHING TO WORK
-                    $.ajax({
-                            url:"/completeOrder",
-                            type:"post",
-                            data:{
-                                orderid: this.orderid
-                            },
-                            
-                            success:function(resp){
-                            console.log("Order Went Through!!!")
-                        }
-                        });
+
                 });
             for(key in removeItems){
                 if(removeItems[key] == 0){

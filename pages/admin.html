@@ -55,11 +55,13 @@
         </div>        
         
         <div id="viewReport" class="hide">
-            <p class="steps">Choose Between Order Or Menu Item Analytics</p>
-            <button id="ordersReport" class="big">ORDER</button>
-            <button id="itemsReport" class="big">MENU ITEM</button>
-            <div id="ordersTotal" class="steps"></div>
-            <div id="itemsTotal" class="steps"></div>
+            <p class="steps">Note: Report is sorted by most recently sold items, shown at the bottom</p>            
+            <p class="steps">Filter report by:</p>
+            <button id="main" class="big">MAIN</button>
+            <button id="sides" class="big">SIDES</button>
+            <button id="dessert" class="big">DESSERT</button>
+            <button id="beverage" class="big">BEVERAGE</button>
+            <div id="revenueTotal" class="steps"></div>
         </div>
         
         <table id="tableInfo" class="hide">
@@ -71,28 +73,18 @@
             <th>Type</th>
             <th>Picture</th>
           </tr>
-        </table>        
+        </table>          
         
-        <table id="ordersTable" class="hide">
-          <tr>
-            <th>Order ID</th>
-            <th>Timestamp</th>
-            <th>Order #</th>
-            <th>Total Price</th>
-            <th>User ID</th>
-          </tr>
-        </table>        
-        
-        <table id="itemsTable" class="hide">
-          <tr>
-            <th>Order ID</th>
-            <th>Item Name</th>
-            <th>Timestamp</th>
-            <th>Item Quantity</th>
+        <table id="reportInfo" class="hide">
+          <tr id="head">
+            <th>Name</th>
             <th>Price</th>
+            <th>Sold Quantity</th>
+            <th>Type</th>
+            <th>Revenue</th>
           </tr>
-        </table>
-        
+        </table>        
+
         <div id="pleaseMenu" class="hide">
             <p class="steps">Step 2: Choose Option</p>
             <button id="pricePlease" class="big">CHANGE PRICE</button>
@@ -101,7 +93,7 @@
         </div>
         
         <div id="changeDB" class="hide">
-            <p class="steps">Step 3 - Change Price:</p>
+            <p class="steps">CHANGE PRICE:</p>
             <p class="steps">Enter the <u>EXACT</u> item name (case sensitive) & new price</p>
             <input id='changeName' type='text' placeholder="Full Item Name" class="enter"/>
             <input id='newPrice' type='text' placeholder="New Price" class="enter"/>
@@ -109,7 +101,7 @@
         </div>            
         
         <div id="changeQty" class="hide">
-            <p class="steps">Step 3 - Change Quantity:</p>
+            <p class="steps">CHANGE QUANTITY:</p>
             <p class="steps">Enter the <u>EXACT</u> item name (case sensitive) & new quantity</p>
             <input id='nameQty' type='text' placeholder="Full Item Name" class="enter"/>
             <input id='newQty' type='text' placeholder="New Quantity" class="enter"/>
@@ -117,7 +109,7 @@
         </div>        
         
         <div id="removeDB" class="hide">
-            <p class="steps">Step 3 - Remove Item:</p>
+            <p class="steps">REMOVE ITEM:</p>
             <p class="steps">Enter the <u>EXACT</u> item name (case sensitive)</p>
             <input id='changeNameRM' type='text' placeholder="Full Item Name" class="enter"/>
             <button id="removeItem" class="big">REMOVE ITEM</button>
