@@ -1109,6 +1109,29 @@ app.post("/removeMyItem", function(req,resp){
         });
     });
 });
+
+app.post("/SalesByDay", function(req, resp){
+     pg.connect(dbURL, function(err, client, done){
+       if(err){
+           console.log(err);
+           var obj = {
+               status:"fail",
+               msg:"CONNECTION FAIL"
+           }
+           resp.send(obj);
+        }
+        
+        client.query("SELECT date, SUM(qty * price) AS total FROM adminitems GROUP BY date", [], function(err, result){
+            done();
+            if(err){console.log(err)}
+            if(result.rows.length > 0){
+                resp.send(result.rows)
+            } else {
+                resp.send({status:"fail"});
+            }
+        });
+     });
+});
 // End of Admin
 
 //Start of NowServing
@@ -1353,29 +1376,3 @@ server.listen(port, function(err){
     
     console.log(port+" is running");
 });
-
-app.post("/SalesByDay", function(req, resp){
-     pg.connect(dbURL, function(err, client, done){
-       if(err){
-           console.log(err);
-           var obj = {
-               status:"fail",
-               msg:"CONNECTION FAIL"
-           }
-           resp.send(obj);
-        }
-        
-        client.query("SELECT * FROM adminItems WHERE datetime > current_date - interval '10' day", [], function(err, result){
-            done();
-            if(result.rows.length > 0){
-                var obj = {
-                    status:"success",
-                    rows: result.rows
-                }
-                resp.send(obj)
-            } else {
-                resp.send({status:"fail"});
-            }
-        });
-     });
-})
