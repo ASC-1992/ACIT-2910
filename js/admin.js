@@ -483,4 +483,15 @@ $(document).ready(function(){
         ordersTable.style.display = "none";
         itemsTable.style.display = "none";
     }
+    
+    function PreviousDaysSales(){
+        
+        $.ajax({
+            url:"/SalesByDay",
+            type:"post",
+            success:function(resp){
+                
+            }
+        })
+    }
 });

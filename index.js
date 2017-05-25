@@ -475,6 +475,9 @@ app.post("/checkout", function(req, resp){
             }
             resp.send(obj);
         }
+        client.query("INSERT INTO adminItems (itemName, qty, price) SELECT itemName, itemqty, price FROM items WHERE orderid = $1", [req.session.orderNum], function(err, result){
+            done();
+        });
         
         client.query("INSERT INTO kitchen (itemName, orderid, qty) SELECT itemName, orderid, itemqty FROM items WHERE orderid = $1 RETURNING itemName, qty", [req.session.orderNum], function(err, result){
             done();
@@ -1346,3 +1349,29 @@ server.listen(port, function(err){
     
     console.log(port+" is running");
 });
+
+app.post("/SalesByDay", function(req, resp){
+     pg.connect(dbURL, function(err, client, done){
+       if(err){
+           console.log(err);
+           var obj = {
+               status:"fail",
+               msg:"CONNECTION FAIL"
+           }
+           resp.send(obj);
+        }
+        
+        client.query("SELECT * FROM adminItems WHERE datetime > current_date - interval '10' day", [], function(err, result){
+            done();
+            if(result.rows.length > 0){
+                var obj = {
+                    status:"success",
+                    rows: result.rows
+                }
+                resp.send(obj)
+            } else {
+                resp.send({status:"fail"});
+            }
+        });
+     });
+})
